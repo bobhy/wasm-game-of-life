@@ -10,6 +10,16 @@ use wasm_bindgen::prelude::wasm_bindgen;
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
+extern crate web_sys;
+
+#[macro_export]
+// A macro to provide `println!(..)`-style syntax for `console.log` logging.
+macro_rules! log {
+    ( $( $t:tt )* ) => {
+        web_sys::console::log_1(&format!( $( $t )* ).into());
+    }
+}
+
 #[wasm_bindgen]
 #[repr(u8)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -27,6 +37,7 @@ pub struct Universe {
 
 #[wasm_bindgen]
 impl Universe {
+
     fn get_index(&self, row: u32, column: u32) -> usize {
         (row * self.width + column) as usize
     }
@@ -82,18 +93,24 @@ impl Universe {
     }
 
     pub fn new() -> Universe {
+        utils::set_panic_hook();
+    
         let width = 64;
         let height = 64;
+
+        let mut alive_count = 0;
 
         let cells = (0..width * height)
             .map(|i| {
                 if i % 2 == 0 || i % 7 == 0 {
-                    Cell::Alive
+                    alive_count += 1; Cell::Alive
                 } else {
                     Cell::Dead
                 }
             })
             .collect();
+
+        log!("Life universe initialized [{}, {}] with {} live cells", width, height, alive_count);
 
         Universe {
             width,
