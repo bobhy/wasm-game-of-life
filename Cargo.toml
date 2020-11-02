@@ -35,13 +35,20 @@ features = [
   "console",
 ]
 
-[profile.release]
-# Tell `rustc` to optimize for small code size.
-opt-level = "s"
-
 # per: https://github.com/rustwasm/wasm-pack/issues/886
 [package.metadata.wasm-pack.profile.release]
 wasm-opt = ["-Oz", "--enable-mutable-globals"]
 
 # [package.metadata.wasm-pack.profile.dev]
 # wasm-opt = false
+
+# release build
+[profile.release]
+# Tell `rustc` to optimize for small code size.
+opt-level = "s"
+
+# dev build (enables some debugging)
+[profile.dev]
+opt-level = 0
+debug = true
+debug-assertions = true
